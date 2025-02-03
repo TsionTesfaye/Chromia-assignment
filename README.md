@@ -47,13 +47,14 @@ In a new terminal
 # Navigate to the blockchain directory
 cd backend
 
+# Start your postgres database (instruction uses inside docker)
+# In a new terminal
+dockerd
+# In a new terminal
+docker start postgres
+
 # Install Chromia files
 chr install
-
-# Start your postgres database (instruction uses inside docker)
-
-dockerd
-docker start postgres
 
 # Start the chain
 chr node start
