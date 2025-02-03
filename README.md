@@ -47,17 +47,37 @@ In a new terminal
 # Navigate to the blockchain directory
 cd backend
 
-# Start your postgres database (instruction uses inside docker)
-# In a new terminal
-dockerd
-# In a new terminal
-docker start postgres
+# If Docker is not running, start Docker daemon first by running:
+# On Linux:
+  sudo dockerd &
+# On Windows:
+  # Open a new PowerShell terminal and run:
+  dockerd
+
+# Start your Postgres database:
+# If you're using Docker:
+  # In a new terminal, run:
+  docker start postgres
+
+# If you're **not** using Docker:
+# On Linux:
+  sudo service postgresql start
+  # Or, use the following if PostgreSQL is installed with systemd:
+  sudo systemctl start postgresql
+
+# On Windows (assuming you have PostgreSQL installed natively):
+  # You can start PostgreSQL by opening "Services" and starting the "PostgreSQL" service manually
+  # Or, you can use PowerShell to start PostgreSQL (if it's installed and configured as a service):
+  Start-Service -Name postgresql-x64-13 # Replace 13 with your PostgreSQL version if different
 
 # Install Chromia files
 chr install
 
 # Start the chain
 chr node start
+
+# Note
+Make sure to go to the directory backend/ on each terminal
 
 ```
 
