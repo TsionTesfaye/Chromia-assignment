@@ -1,0 +1,27 @@
+blockchains:
+  my_rell_dapp:
+    module: main
+    moduleArgs:
+      lib.ft4.core.auth:
+        evm_signatures_authorized_operations:
+          - create_user
+      lib.ft4.core.accounts:
+        auth_descriptor:
+          max_number_per_account: 200
+compile:
+  rellVersion: 0.13.14
+database:
+  schema: schema_my_rell_dapp
+  host: 172.17.0.1
+test:
+  modules:
+    - test
+libs:
+  ft4:
+    registry: https://bitbucket.org/chromawallet/ft3-lib
+    path: rell/src/lib/ft4
+    tagOrBranch: v0.8.0r
+    rid: x"B6AE6AC82AC735BFB9E4E412FFB76BF95380E94F371F5F6A14E71A3AA7D5FEF6"
+    insecure: false
+
+  

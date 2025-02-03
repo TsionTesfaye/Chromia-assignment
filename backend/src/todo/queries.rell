@@ -1,0 +1,106 @@
+struct task_dto {
+    user: struct<user>;
+    id: byte_array;
+    title: text;
+    description: text;
+    iscomplete: boolean;
+    duedate: text;
+    timestamp: timestamp;
+}
+
+
+query get_paginated_task(
+    title: text,
+    pointer: integer,
+    max: integer,
+    id: byte_array
+): (pointer: integer, tasks: list<task_dto>) {
+    val currentUser = user @ { id };
+
+    if (title.empty()) {
+
+        val tasks = todo @* { .user == currentUser } (
+            task_dto (
+                user = .user.to_struct(),
+                .id,
+                .title,
+                .description,
+                .iscomplete,
+                .duedate,
+                .timestamp
+            )
+        ) offset pointer limit max;
+
+        return (pointer = pointer + tasks.size(), tasks = tasks);
+    } else {
+        val title_lowercase = title.lower_case();
+        val search_title = "%" + title_lowercase + "%";
+        val tasks = todo @* { .user == currentUser, .title.like(search_title) } (
+            task_dto (
+                user = .user.to_struct(),
+                .id,
+                .title,
+                .description,
+                .iscomplete,
+                .duedate,
+                .timestamp
+            )
+        ) offset pointer limit max;
+        return (pointer = pointer + tasks.size(), tasks = tasks);
+    }
+}
+
+query get_task(id: byte_array, user_id: byte_array) {
+    val currentUser = user @ { id };
+    val task = require(todo @? { .id == id, .user == currentUser }, "You can not view this task");
+    return task;
+}
+
+query get_user(id: byte_array) {
+    val user = user @ { id }(.name);
+    return user;
+}
+
+query get_all_users() {
+    return user @* { } ( .name, .id );
+}
+
+query get_total_tasks(title: text, id: byte_array) {
+    val currentUser = user @ { id };
+    if (title.empty()) {
+        val total_tasks = require(todo @? { .user == currentUser } ( @sum 1 ), "You can not get total tasks");
+        return total_tasks;
+    } else {
+        val title_lowercase = title.lower_case();
+        val search_title = "%" + title_lowercase + "%";
+
+        val total_tasks = require(
+            todo @? {
+                .user == currentUser,
+                .title.like(search_title)
+            } (
+                @sum 1
+            ),
+            "You can not get total tasks"
+        );
+        return total_tasks;
+    }
+}
+
+query get_tasks_stat(id: byte_array) {
+    val currentUser = user @ { id };
+
+    // Total tasks
+    val total_tasks = todo @? { .user == currentUser } ( @sum 1 );
+
+    // Completed tasks
+    val completed_tasks = todo @? { .user == currentUser, .iscomplete == true } ( @sum 1 );
+    
+    // Overdue tasks (tasks that are not completed and have a due date in the past)
+    
+    return (
+        total = total_tasks,
+        completed = completed_tasks,
+        
+    );
+}
